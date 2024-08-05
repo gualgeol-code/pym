@@ -1,17 +1,16 @@
-import requests
+import socket
+import json
 import hashlib
 import binascii
-import json
 import random
-import socket
 import time
-from threading import Thread
 import logging
 
 # Configure your Verus address and pool connection
 ADDRESS = "RP6jeZhhHiZmzdufpXHCWjYVHsLaPXARt1"
-POOL_URL = 'okeycn-26223.portmap.host'
-POOL_PORT = 26223
+POOL_URL = 'stratum+tcp://na.luckpool.net'
+POOL_HOST = 'luckpool.net'
+POOL_PORT = 3960
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, filename="miner.log", format='%(asctime)s %(message)s')
@@ -55,7 +54,7 @@ def get_job(sock):
 
 def mine():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.connect((POOL_URL, POOL_PORT))
+    sock.connect((POOL_HOST, POOL_PORT))
     logg("Connected to mining pool")
 
     job_id, prevhash, merkle_root, version, nbits, ntime, target, extranonce2 = get_job(sock)
