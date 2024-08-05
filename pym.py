@@ -58,9 +58,27 @@ def VerusMiner(restart=False):
 
     sock.sendall(b'{"id": 1, "method": "mining.subscribe", "params": []}\n')
 
-    lines = sock.recv(1024).decode().split('\n')
-    response = json.loads(lines[0])
-    sub_details, extranonce1, extranonce2_size = response['result'][:3]
+    response = b''
+    while response.count(b'\n') < 2:
+        response += sock.recv(1024)
+    
+    lines = response.decode().split('\n')
+    print(f"Received response: {lines}")
+
+    try:
+        response_json = json.loads(lines[0])
+        print(f"Parsed JSON response: {response_json}")
+        
+        sub_details = response_json['result']
+        if len(sub_details) < 3:
+            logg(f"Warning: Expected 3 elements in 'result', but got {len(sub_details)} elements.")
+            print(f"Warning: Expected 3 elements in 'result', but got {len(sub_details)} elements.")
+            return False
+        
+        sub_details, extranonce1, extranonce2_size = sub_details[:3]
+    except (json.JSONDecodeError, ValueError) as e:
+        logg(f"Error parsing response: {e}")
+        return False
 
     sock.sendall(b'{"params": ["' + address.encode() + b'", "password"], "id": 2, "method": "mining.authorize"}\n')
 
