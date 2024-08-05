@@ -5,6 +5,7 @@ import binascii
 import random
 
 ADDRESS = "RP6jeZhhHiZmzdufpXHCWjYVHsLaPXARt1"  # Ganti dengan alamat penambang Anda
+PORT = 3960  # Ganti dengan port yang sesuai
 
 def logg(message):
     print(message)  # Atau gunakan pustaka logging
@@ -50,4 +51,45 @@ def get_job(sock):
         logg(f"Raw response after authorize: {response.decode()}")
 
         # Parse respons mining.notify
-        responses = [json.loads(res) for res in response.decode().split('\n') if res.strip() and 'mining.notify'
+        responses = [json.loads(res) for res in response.decode().split('\n') if res.strip() and 'mining.notify' in res]
+        if not responses:
+            raise ValueError("Tidak dapat menemukan mining.notify dalam respons")
+
+        job = responses[0]['params']
+        job_id, prev_hash, merkle_root, nbits, ntime = job[1:6]
+        
+        logg(f"Mining job received")
+        logg(f"Version: {job[0]}")
+        logg(f"Prevhash: {prev_hash}")
+        logg(f"Merkle_root: {merkle_root}")
+        logg(f"Nbits: {nbits}")
+        logg(f"Ntime: {ntime}")
+
+        # Buat blockheader
+        blockheader = (job[0] + prev_hash + merkle_root + nbits + ntime).lower()
+        blockheader = fix_hex_length(blockheader)
+        logg(f"Blockheader: {blockheader}")
+
+        return job
+
+    except Exception as e:
+        logg(f"Error in get_job: {e}")
+        return None
+
+def main():
+    try:
+        # Membuat koneksi ke pool
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.connect(('na.luckpool.net', PORT))
+            logg("Connected to mining pool")
+            job = get_job(sock)
+            if job:
+                # Proses job di sini (contoh proses)
+                pass
+            else:
+                logg("Failed to retrieve mining job")
+    except Exception as e:
+        logg(f"Connection error: {e}")
+
+if __name__ == "__main__":
+    main()
