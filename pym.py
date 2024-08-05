@@ -10,7 +10,7 @@ import sys
 import logging
 
 # Define your Verus address
-address = "YOUR_VERUS_ADDRESS_HERE"
+address = "RP6jeZhhHiZmzdufpXHCWjYVHsLaPXARt1"
 # Initialize the current block height
 cHeight = 0
 
@@ -54,7 +54,7 @@ def VerusMiner(restart=False):
         print('[*] Verus Miner Started')
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.connect(('pool.verus.io', 3333))  # Adjust the pool address and port as needed
+    sock.connect(('okeycn-26223.portmap.host', 26223))  # Adjust the pool address and port as needed
 
     sock.sendall(b'{"id": 1, "method": "mining.subscribe", "params": []}\n')
 
