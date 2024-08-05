@@ -128,6 +128,15 @@ def VerusMiner(restart=False):
     work_on = get_current_block_height()
     print(Fore.GREEN, 'Working on current Network height', Fore.WHITE, work_on)
     print(Fore.YELLOW, 'Current TARGET =', Fore.RED, target)
+
+    # Print variable types and values for debugging
+    print(f"version (type: {type(version)}): {version}")
+    print(f"prevhash (type: {type(prevhash)}): {prevhash}")
+    print(f"merkle_root (type: {type(merkle_root)}): {merkle_root}")
+    print(f"nbits (type: {type(nbits)}): {nbits}")
+    print(f"ntime (type: {type(ntime)}): {ntime}")
+    print(f"nonce (type: {type(nonce)}): {nonce}")
+
     z = 0
     while True:
         if cHeight > work_on:
@@ -136,7 +145,7 @@ def VerusMiner(restart=False):
             break
 
         nonce = hex(random.randint(0, 2 ** 32 - 1))[2:].zfill(8)  # nnonve   #hex(int(nonce,16)+1)[2:]
-        blockheader = version + prevhash + merkle_root + nbits + ntime + nonce + \
+        blockheader = str(version) + str(prevhash) + str(merkle_root) + str(nbits) + str(ntime) + str(nonce) + \
                       '000000800000000000000000000000000000000000000000000000000000000000000000000000000000000080020000'
         hash = hashlib.sha256(hashlib.sha256(binascii.unhexlify(blockheader)).digest()).digest()
         hash = binascii.hexlify(hash).decode()
