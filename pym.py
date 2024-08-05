@@ -112,6 +112,11 @@ def VerusMiner(restart=False):
     extranonce2 = hex(random.randint(0, 2 ** 32 - 1))[2:].zfill(2 * extranonce2_size)  # create random
 
     coinbase = coinb1 + extranonce1 + extranonce2 + coinb2
+
+    # Ensure even length for hex string
+    if len(coinbase) % 2 != 0:
+        coinbase = '0' + coinbase
+
     coinbase_hash_bin = hashlib.sha256(hashlib.sha256(binascii.unhexlify(coinbase)).digest()).digest()
 
     merkle_root = coinbase_hash_bin
@@ -128,14 +133,6 @@ def VerusMiner(restart=False):
     work_on = get_current_block_height()
     print(Fore.GREEN, 'Working on current Network height', Fore.WHITE, work_on)
     print(Fore.YELLOW, 'Current TARGET =', Fore.RED, target)
-
-    # Print variable types and values for debugging
-    print(f"version (type: {type(version)}): {version}")
-    print(f"prevhash (type: {type(prevhash)}): {prevhash}")
-    print(f"merkle_root (type: {type(merkle_root)}): {merkle_root}")
-    print(f"nbits (type: {type(nbits)}): {nbits}")
-    print(f"ntime (type: {type(ntime)}): {ntime}")
-    print(f"nonce (type: {type(nonce)}): {nonce}")
 
     z = 0
     while True:
@@ -159,16 +156,16 @@ def VerusMiner(restart=False):
         print(Fore.YELLOW, str(z), 'HASH :', Fore.RED, ' 000000000000000000{}'.format(hash), end='\r')
         z += 1
 
+        if hash.startswith('000000000000000000'): logg('hash: {}'.format(hash))
+        print(Fore.BLUE, str(z), 'HASH :', Fore.GREEN, ' 000000000000000000{}'.format(hash), end='\r')
+        z += 1
+
+        if hash.startswith('0000000000000000'): logg('hash: {}'.format(hash))
+        print(Fore.MAGENTA, str(z), 'HASH :', Fore.YELLOW, ' 0000000000000000{}'.format(hash), end='\r')
+        z += 1
+
         if hash.startswith('000000000000000'): logg('hash: {}'.format(hash))
-        print(Fore.BLUE, str(z), 'HASH :', Fore.GREEN, ' 000000000000000{}'.format(hash), end='\r')
-        z += 1
-
-        if hash.startswith('000000000000'): logg('hash: {}'.format(hash))
-        print(Fore.MAGENTA, str(z), 'HASH :', Fore.YELLOW, ' 000000000000{}'.format(hash), end='\r')
-        z += 1
-
-        if hash.startswith('0000000'): logg('hash: {}'.format(hash))
-        print(Fore.CYAN, str(z), 'HASH :', Fore.YELLOW, '0000000{}'.format(hash), end='\r')
+        print(Fore.CYAN, str(z), 'HASH :', Fore.YELLOW, '000000000000000{}'.format(hash), end='\r')
         z += 1
 
         if hash < target:
